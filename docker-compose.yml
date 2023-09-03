@@ -1,0 +1,23 @@
+version: '3'
+services:
+  myapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 9292:9292
+    environment:
+      - MONGODB_CONNECTION_STRING=${MONGODB_CONNECTION_STRING}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
+      - MONGODB_COLLECTION=${MONGODB_COLLECTION}
+    # labels:
+    #     traefik.enable: true
+    #     traefik.http.routers.luxey-api.entrypoints: websecure
+    #     traefik.http.routers.luxey-api.rule: Host(`luxey-api.embery.io`)
+    #     traefik.http.services.luxey-api.loadbalancer.server.port: 8818
+    # networks:
+    #   proxy:
+      
+networks:
+  proxy:
+    external: true

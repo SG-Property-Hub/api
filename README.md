@@ -1,1 +1,2 @@
-# api
+# 
+export $(cat .env | xargs)
