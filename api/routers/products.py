@@ -6,12 +6,29 @@ import json
 def get_products(
                 #  fields: str = Query(...),
                  limit: int = Query(50),
+                 category: str = Query(None, max_length=50),
+                 dist: str = Query(None, max_length=50)
                 #  offset: int = Query(0),
                 #  sort_by: str = Query(None)
                  ):
-    data = collection.find({}).limit(limit)
+    
+    query= {}
+    #Category form: Nhà ở,Căn hộ/Chung cư
+    if category:
+        category= category.split(",")
+        query["category"] = {'$in' :category}
+
+    #dist form: Quận 1,Quận 2
+    if dist:
+        dist= dist.split(",")
+        query["dist"] = {'$in' :dist}
+
+    data = collection.find(query).limit(limit)
     data = list(data)
-    for i in range(len(data)):
-        data[i].pop('_id')
-    products = data
-    return products
+    if len(data) == 0:
+        return {"Error": "No Data"}
+    else:
+        for i in range(len(data)):
+            data[i].pop('_id')
+        products = data
+        return products
