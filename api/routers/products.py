@@ -2,26 +2,28 @@ from . import router, collection
 from fastapi import Query
 import json
 
-@router.get("/api/products")
+@router.get("/api/product")
 def get_products(
                 #  fields: str = Query(...),
-                 limit: int = Query(50),
-                 category: str = Query(None, max_length=50),
-                 dist: str = Query(None, max_length=50)
+                 limit:     int = Query(50),
+                 category:  str = Query(None, max_length=50),
+                 dist:      str = Query(None, max_length=50),
+                 id:        str=  Query(None, max_length=50)
                 #  offset: int = Query(0),
                 #  sort_by: str = Query(None)
                  ):
     
     query= {}
-    #Category form: Nhà ở,Căn hộ/Chung cư
+    # Query Category 
     if category:
-        category= category.split(",")
-        query["category"] = {'$in' :category}
+        query["category"] = category
 
-    #dist form: Quận 1,Quận 2
+    #Query dist 
     if dist:
-        dist= dist.split(",")
-        query["dist"] = {'$in' :dist}
+        query["dist"] = dist
+    #Query id form raw_id:
+    if id:
+        query["raw_id"] = id
 
     data = collection.find(query).limit(limit)
     data = list(data)
@@ -30,5 +32,5 @@ def get_products(
     else:
         for i in range(len(data)):
             data[i].pop('_id')
-        products = data
+        products = data[0]
         return products
