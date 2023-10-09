@@ -38,5 +38,7 @@ def get_products(
 def get_product(
                     id:        str = Query(None, max_length=50),
                 ):
-    data = collection.find_one({"raw_id":id},{'_id': 0})
-    return data
+    product = collection.find_one({"raw_id":id},{'_id': 0})
+    if not product:
+        return {"error":"Not found"}
+    return product
