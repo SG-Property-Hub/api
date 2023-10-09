@@ -2,13 +2,13 @@ from . import router, collection
 from fastapi import Query
 import json
 
-@router.get("/api/product")
+@router.get("/api/products")
 def get_products(
                 #  fields: str = Query(...),
                  limit:     int = Query(50),
                  category:  str = Query(None, max_length=50),
                  dist:      str = Query(None, max_length=50),
-                 id:        str=  Query(None, max_length=50)
+                 q:         str = Query(None)
                 #  offset: int = Query(0),
                 #  sort_by: str = Query(None)
                  ):
@@ -21,16 +21,24 @@ def get_products(
     #Query dist 
     if dist:
         query["dist"] = dist
-    #Query id form raw_id:
-    if id:
-        query["raw_id"] = id
 
-    data = collection.find(query).limit(limit)
+    #Query string title
+    if q:
+        query["title"]= { "$regex":f".*{q}.*"}
+
+    data = collection.find(query,{'_id': 0}).limit(limit)
     data = list(data)
     if len(data) == 0:
         return {"Error": "No Data"}
     else:
-        for i in range(len(data)):
-            data[i].pop('_id')
-        products = data[0]
+        products = data
         return products
+
+@router.get("/api/product")
+def get_product(
+                    id:        str = Query(None, max_length=50),
+                ):
+    product = collection.find_one({"raw_id":id},{'_id': 0})
+    if not product:
+        return {"error":"Not found"}
+    return product
