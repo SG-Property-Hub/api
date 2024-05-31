@@ -33,7 +33,7 @@ def get_products(
 
 @router.get("/api/product")
 def get_product(id: str = Query(None, max_length=50)):
-    product = collection.find_one({"raw_id": id}, {'_id': 0})
+    product = collection.find_one({"id": id}, {'_id': 0})
     
     if not product:
         raise HTTPException(status_code=404, detail="Not found")
