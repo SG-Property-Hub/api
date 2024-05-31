@@ -6,7 +6,6 @@ MONGODB_CONNECTION_STRING = os.environ['MONGODB_CONNECTION_STRING']
 MONGODB_DATABASE = os.environ['MONGODB_DATABASE']
 MONGODB_COLLECTION = os.environ['MONGODB_COLLECTION']
 
-kk = 2
 client = MongoClient(MONGODB_CONNECTION_STRING)
 db = client[MONGODB_DATABASE]
 collection = db[MONGODB_COLLECTION]
@@ -28,5 +27,5 @@ def root():
     """
     return {
         "message": "Welcome to the SGP Hub API. It is currently running and ready to serve requests.",
-        "version": "1.0.0"
+        "version": "1.0.1"
     }

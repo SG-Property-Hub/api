@@ -3,10 +3,13 @@ from fastapi import Query, HTTPException
 
 @router.get("/api/products")
 def get_products(
+    #  fields: str = Query(...),
     limit: int = Query(50),
     category: str = Query(None, max_length=50),
     dist: str = Query(None, max_length=50),
-    q: str = Query(None)
+    q: str = Query(None),
+    #  offset: int = Query(0),
+    #  sort_by: str = Query(None)
 ):
     query = {}
 
