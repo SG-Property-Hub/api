@@ -3,9 +3,9 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker,declarative_base
 
-DATABASE_URL=os.environ.get('DATABASE_URL')
+POSTGRE_URL=os.environ.get('POSTGRE_URL')
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(POSTGRE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

@@ -7,7 +7,7 @@ services:
     ports:
       - 9292:9292
     environment:
-      - DATABASE_URL=${POSTGRE_URL}
+      - POSTGRE_URL=${POSTGRE_URL}
     # labels:
     #     traefik.enable: true
     # networks:
