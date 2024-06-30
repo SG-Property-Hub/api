@@ -7,14 +7,12 @@ services:
     ports:
       - 9292:9292
     environment:
-      - MONGODB_CONNECTION_STRING=${MONGODB_CONNECTION_STRING}
-      - MONGODB_DATABASE=${MONGODB_DATABASE}
-      - MONGODB_COLLECTION=${MONGODB_COLLECTION}
+      - DATABASE_URL=${POSTGRE_URL}
     # labels:
     #     traefik.enable: true
     # networks:
     #   proxy:
-      
+
 networks:
   proxy:
     external: true

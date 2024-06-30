@@ -1,20 +1,19 @@
 import os
 from fastapi import FastAPI
-from pymongo.mongo_client import MongoClient
+from sqlalchemy import create_engine, func
+from sqlalchemy.orm import sessionmaker,declarative_base
 
-MONGODB_CONNECTION_STRING = os.environ['MONGODB_CONNECTION_STRING']
-MONGODB_DATABASE = os.environ['MONGODB_DATABASE']
-MONGODB_COLLECTION = os.environ['MONGODB_COLLECTION']
+DATABASE_URL=os.environ.get('DATABASE_URL')
 
-client = MongoClient(MONGODB_CONNECTION_STRING)
-db = client[MONGODB_DATABASE]
-collection = db[MONGODB_COLLECTION]
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 from .routers import router as machine_router
 
 app = FastAPI()
 app.include_router(machine_router)
+
 
 
 @app.get("/")

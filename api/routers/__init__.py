@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 router = APIRouter(tags=["stacks"])
 
-from ..main import collection
+from ..main import SessionLocal,func
+
+from ..model import House,Location,Attr,Agent,Project,Property
 
 from .products import *
