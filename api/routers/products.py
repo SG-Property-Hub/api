@@ -8,7 +8,10 @@ def get_products(
     limit: int = Query(24),
     category: str = Query(None, max_length=50),
     dist: str = Query(None, max_length=50),
+    city: str = Query(None, max_length=50),
     q: str = Query(None),
+    lowest_price: int = Query(None),
+    highest_price: int = Query(None),
     offset: int = Query(0),
     #  sort_by: str = Query(None)
 ):
@@ -21,11 +24,23 @@ def get_products(
 
         if dist:
             query = query.filter(Property.location_dist == dist)
-            
+        
+        if city:
+            query = query.filter(Property.location_city == city)
+           
         if q:
             query = query.filter(Property.title.like(f"%{q}%"))
         
-        limit = min(limit, 100)
+        limit = min(limit+offset, 100+offset)
+            
+        query = query.filter(Property.price.isnot(None))
+        
+        if lowest_price:
+            query = query.filter(Property.price>= lowest_price)
+        
+        if highest_price:
+            query = query.filter(Property.price<= highest_price)   
+        
         
         query = query.limit(limit)
          
@@ -37,6 +52,8 @@ def get_products(
         for item in data:
             item.image = item.image.strip("[]").split(",")
 
+        data = data[offset:]
+                    
         return data
     except Exception as e:
         print("Error when get products: ",e)
@@ -46,6 +63,8 @@ def get_product(id: str = Query(None, max_length=50)):
     try:
         db = SessionLocal()
         query = db.query(Property)
+        
+        
         # query_h = db.query(House).filter(House.id == id).first()
         # query_l = db.query(Location).filter(Location.id == id).first()
         # query_at = db.query(Attr).filter(Attr.id == id).first()
@@ -59,11 +78,21 @@ def get_product(id: str = Query(None, max_length=50)):
         # product['attr'] = query_at.to_dict() if query_at else None
         # product['agent'] = query_a.to_dict() if query_a else None
         # product['project'] = query_p.to_dict() if query_p else None
-        product = query.filter(Property.id == id).all()
+        
+        
+        query = query.filter(Property.price.isnot(None))
+        
+        query = query.filter(Property.id == id)
+        
+        product = query.first().all()
+        
         if not product:
             raise HTTPException(status_code=404, detail="Item not found")
+        
         for item in product:
             item.image = item.image.strip("[]").split(",")
+
+        
         return product
     except Exception as e:
         print("Error when get product: ",e)
@@ -131,3 +160,4 @@ def get_product(
     
     except Exception as e:
         print("Error when get products: ",e)
+
