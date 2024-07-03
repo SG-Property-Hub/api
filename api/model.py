@@ -136,3 +136,11 @@ class Property(Base):
     project_name = Column(String)
     project_profile = Column(String)
     image = Column(Text)
+    
+class PriceAVG(Base):
+    __tablename__ = 'price_average'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    dist = Column(String(100))
+    ward = Column(String(100))
+    avg_price = Column(Float)
+    num_item = Column(Integer)

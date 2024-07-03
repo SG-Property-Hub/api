@@ -1,4 +1,4 @@
-from . import router,SessionLocal,func,House,Location,Attr,Agent,Project,Property
+from . import router,SessionLocal,func,House,Location,Attr,Agent,Project,Property,PriceAVG
 import json
 from fastapi import Query, HTTPException
 
@@ -12,6 +12,10 @@ def get_products(
     q: str = Query(None),
     lowest_price: int = Query(None),
     highest_price: int = Query(None),
+    lat_tl: float = Query(None),
+    long_tl: float = Query(None),  
+    lat_br: float = Query(None),
+    long_br: float = Query(None),
     offset: int = Query(0),
     #  sort_by: str = Query(None)
 ):
@@ -31,10 +35,14 @@ def get_products(
         if q:
             query = query.filter(Property.title.like(f"%{q}%"))
         
+        if lat_tl and lat_br and long_tl and long_br:
+            query = query.filter(Property.location_lat >= lat_br).filter(Property.location_lat <= lat_tl)
+            query = query.filter(Property.location_long >= long_tl).filter(Property.location_long <= long_br)    
+        
         limit = min(limit+offset, 100+offset)
             
         query = query.filter(Property.price.isnot(None))
-        
+            
         if lowest_price:
             query = query.filter(Property.price>= lowest_price)
         
@@ -98,40 +106,86 @@ def get_product(id: str = Query(None, max_length=50)):
         print("Error when get product: ",e)
 
 
+# @router.get("/api/index/get_avg_price")
+# def get_product(
+#     by: str = Query(None, max_length=50),
+#     name: str = Query(None, max_length=50),
+#     product_id: str = Query(None, max_length=50)
+#     ):
+#     try:
+#         db = SessionLocal()
+#         if not by or (not name and not product_id):
+#             raise HTTPException(status_code=404, detail="filter null")       
+#         if product_id:
+#             city_name = db.query(Property.location_city).filter(Property.id == product_id).scalar()
+#             if by == "ward":
+#                 name = db.query(Property.location_ward).filter(Property.id == product_id).scalar()
+#                 average_price = db.query(func.avg(Property.price)).filter(Property.location_city == city_name).filter(Property.location_ward == name).scalar()
+#             if by == "dist":
+#                 name = db.query(Property.location_dist).filter(Property.id == product_id).scalar()
+#                 average_price = db.query(func.avg(Property.price)).filter(Property.location_city == city_name).filter(Property.location_dist == name).scalar()
+#         else:
+#             if by == "ward":
+#                 query = db.query(func.avg(Property.price))
+#                 average_price = query.filter(Property.location_ward == name).scalar()
+#             if by == "dist":  
+#                 query = db.query(func.avg(Property.price))
+#                 average_price = query.filter(Property.location_dist == name).scalar()
+#         data = {
+#             "by":by,
+#             "name":name,
+#             "value":average_price
+#         }
+        
+#         return data
+#     except Exception as e:
+#         print("Error when get products: ",e)
+
 @router.get("/api/index/get_avg_price")
 def get_product(
-    by: str = Query(None, max_length=50),
-    name: str = Query(None, max_length=50),
+    by: str = Query("dist", max_length=50),
+    dist: str = Query(None, max_length=50),
+    ward: str = Query(None, max_length=50),
     product_id: str = Query(None, max_length=50)
     ):
     try:
         db = SessionLocal()
-        if not by or (not name and not product_id):
+        if not dist and not product_id:
             raise HTTPException(status_code=404, detail="filter null")       
         if product_id:
-            city_name = db.query(Property.location_city).filter(Property.id == product_id).scalar()
             if by == "ward":
-                name = db.query(Property.location_ward).filter(Property.id == product_id).scalar()
-                average_price = db.query(func.avg(Property.price)).filter(Property.location_city == city_name).filter(Property.location_ward == name).scalar()
-            if by == "dist":
-                name = db.query(Property.location_dist).filter(Property.id == product_id).scalar()
-                average_price = db.query(func.avg(Property.price)).filter(Property.location_city == city_name).filter(Property.location_dist == name).scalar()
+                dist = db.query(Property.location_dist).filter(Property.id == product_id).scalar()
+                ward = db.query(Property.location_ward).filter(Property.id == product_id).scalar()
+                query = db.query(PriceAVG.avg_price)
+                average_price = query.filter(PriceAVG.dist == dist).filter(PriceAVG.ward == ward).scalar()
+            else:
+                dist = db.query(Property.location_dist).filter(Property.id == product_id).scalar()
+                query = db.query(func.sum(PriceAVG.avg_price * PriceAVG.num_item))
+                data = query.filter(PriceAVG.dist == dist).scalar()
+                num_item = db.query(func.sum(PriceAVG.num_item)).filter(PriceAVG.dist == dist).scalar()
+                average_price = data / num_item
         else:
             if by == "ward":
-                query = db.query(func.avg(Property.price))
-                average_price = query.filter(Property.location_ward == name).scalar()
-            if by == "dist":  
-                query = db.query(func.avg(Property.price))
-                average_price = query.filter(Property.location_dist == name).scalar()
+                query = db.query(PriceAVG.avg_price)
+                average_price = query.filter(PriceAVG.dist == dist).filter(PriceAVG.ward == ward).scalar()
+            else:
+                query = db.query(func.sum(PriceAVG.avg_price * PriceAVG.num_item))
+                data = query.filter(PriceAVG.dist == dist).scalar()
+                num_item = db.query(func.sum(PriceAVG.num_item)).filter(PriceAVG.dist == dist).scalar()
+                average_price = data / num_item
+                    
+
         data = {
             "by":by,
-            "name":name,
+            "dist":dist,
+            "ward":ward,
             "value":average_price
         }
         
         return data
     except Exception as e:
         print("Error when get products: ",e)
+
         
 @router.get("/api/map/get_item_in_rec")
 def get_product(
