@@ -38,9 +38,9 @@ def get_products(
         if lat_tl and lat_br and long_tl and long_br:
             query = query.filter(Property.location_lat >= lat_br).filter(Property.location_lat <= lat_tl)
             query = query.filter(Property.location_long >= long_tl).filter(Property.location_long <= long_br)    
+
+        query = query.filter(Property.site != '123nhadatviet')
         
-        limit = min(limit+offset, 100+offset)
-            
         query = query.filter(Property.price.isnot(None))
             
         if lowest_price:
@@ -49,7 +49,8 @@ def get_products(
         if highest_price:
             query = query.filter(Property.price<= highest_price)   
         
-        
+
+        query = query.offset(offset)
         query = query.limit(limit)
          
         data = query.all()
