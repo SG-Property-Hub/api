@@ -3,8 +3,7 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker,declarative_base
 
-POSTGRE_URL=os.environ.get('POSTGRE_URL')
-
+POSTGRE_URL = os.environ.get('POSTGRE_URL')
 engine = create_engine(POSTGRE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -13,8 +12,6 @@ from .routers import router as machine_router
 
 app = FastAPI()
 app.include_router(machine_router)
-
-
 
 @app.get("/")
 def root():

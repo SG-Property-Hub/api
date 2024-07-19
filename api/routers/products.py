@@ -60,51 +60,29 @@ def get_products(
         
         for item in data:
             item.image = item.image.strip("[]").split(",")
-
-        data = data[offset:]
                     
         return data
     except Exception as e:
         print("Error when get products: ",e)
 
 @router.get("/api/product")
-def get_product(id: str = Query(None, max_length=50)):
+def get_product(id: str = Query(None, max_length = 50)):
     try:
         db = SessionLocal()
+        print(db)
         query = db.query(Property)
-        
-        
-        # query_h = db.query(House).filter(House.id == id).first()
-        # query_l = db.query(Location).filter(Location.id == id).first()
-        # query_at = db.query(Attr).filter(Attr.id == id).first()
-        # query_a = db.query(Agent).filter(Agent.id == id).first()
-        # query_p = db.query(Project).filter(Project.id == id).first()
-        
-        # if not query_h:
-        #     raise HTTPException(status_code=404, detail="Not found")
-        # product = query_h.to_dict()
-        # product['location'] = query_l.to_dict() if query_l else None
-        # product['attr'] = query_at.to_dict() if query_at else None
-        # product['agent'] = query_a.to_dict() if query_a else None
-        # product['project'] = query_p.to_dict() if query_p else None
-        
-        
         query = query.filter(Property.price.isnot(None))
-        
         query = query.filter(Property.id == id)
-        
-        product = query.first().all()
-        
-        if not product:
-            raise HTTPException(status_code=404, detail="Item not found")
-        
-        for item in product:
-            item.image = item.image.strip("[]").split(",")
 
+        product = query.one_or_none()
+        if not product:
+            raise HTTPException(status_code = 404, detail = "Item not found")
+
+        product.image = product.image.strip("[]").split(",")
         
         return product
     except Exception as e:
-        print("Error when get product: ",e)
+        print("Error when get product: ", e)
 
 
 # @router.get("/api/index/get_avg_price")

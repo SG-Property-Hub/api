@@ -7,11 +7,4 @@ services:
     ports:
       - 9292:9292
     environment:
-      - POSTGRE_URL=postgresql://postgres:euro2024@178.128.93.194:50432/sgp
-    #     traefik.enable: true
-    # networks:
-    #   proxy:
-
-networks:
-  proxy:
-    external: true
+      - POSTGRE_URL=${POSTGRE_URL}
