@@ -42,6 +42,7 @@ def get_products(
         query = query.filter(Property.site != '123nhadatviet')
         
         query = query.filter(Property.price.isnot(None))
+        query = query.filter(func.length(Property.image) > 15)
             
         if lowest_price:
             query = query.filter(Property.price>= lowest_price)

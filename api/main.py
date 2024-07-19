@@ -23,5 +23,5 @@ def root():
     """
     return {
         "message": "Welcome to the SGP Hub API. It is currently running and ready to serve requests.",
-        "version": "1.0.2"
+        "version": "1.0.3"
     }
