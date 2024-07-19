@@ -59,7 +59,14 @@ def get_products(
             raise HTTPException(status_code=404, detail="Item not found")
         
         for item in data:
-            item.image = item.image.strip("[]").split(",")
+            tmp_image = item.image.strip("[]").split(",")
+            image = []
+            for img in tmp_image:
+                if len(img) > len('https://cnd.vdcent'):
+                    image.append(img.strip())
+                
+            item.image = image
+            
                     
         return data
     except Exception as e:
