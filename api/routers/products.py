@@ -1,4 +1,4 @@
-from . import router,SessionLocal,func,House,Location,Attr,Agent,Project,Property,PriceAVG
+from . import router, SessionLocal, func, House, Location, Attr, Agent, Project, Property, PriceAVG, not_
 import json
 from fastapi import Query, HTTPException
 
@@ -39,7 +39,8 @@ def get_products(
             query = query.filter(Property.location_lat >= lat_br).filter(Property.location_lat <= lat_tl)
             query = query.filter(Property.location_long >= long_tl).filter(Property.location_long <= long_br)    
 
-        query = query.filter(Property.site != '123nhadatviet')
+        excluded_sites = ['123nhadatviet', 'i-batdongsan']
+        query = query.filter(not_(Property.site.in_(excluded_sites)))
         
         query = query.filter(Property.price.isnot(None))
         query = query.filter(func.length(Property.image) > 15)

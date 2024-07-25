@@ -1,7 +1,8 @@
 import os
 from fastapi import FastAPI
-from sqlalchemy import create_engine, func
-from sqlalchemy.orm import sessionmaker,declarative_base
+from sqlalchemy import create_engine, func, not_
+from sqlalchemy.orm import sessionmaker, declarative_base
+
 
 POSTGRE_URL = os.environ.get('POSTGRE_URL')
 engine = create_engine(POSTGRE_URL)
